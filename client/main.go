@@ -23,7 +23,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("Error when calling SayHello: %s", err)
+		log.Fatalf("Error when calling PutRecord: %s", err)
 	}
 	log.Printf("Response from server: %s -> %s", response.Key, response.Value)
 }
