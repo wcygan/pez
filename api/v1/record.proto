@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pez;
+
+option go_package = "github.com/wcygan/api/pez";
+
+message GetRequest {
+  string key = 1;
+}
+
+message PutRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message Record {
+  string key = 1;
+  string value = 2;
+}
+
+service DataService {
+  rpc PutRecord(PutRequest) returns (Record) {}
+  rpc GetRecord(GetRequest) returns (Record) {}
+}
