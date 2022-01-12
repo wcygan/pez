@@ -23,7 +23,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	api "github.com/wcygan/pez/api/v1"
 	"google.golang.org/grpc"
@@ -39,7 +38,10 @@ func StartServer(port int) {
 		log.Printf("pez is listening on port %d\n", port)
 	}
 
-	dataService := DataService{}
+	dataService := DataService{
+		UnimplementedDataServiceServer: api.UnimplementedDataServiceServer{},
+		datastore:                      Datastore{backingStore: make(map[string]string)},
+	}
 
 	grpcServer := grpc.NewServer()
 
@@ -52,16 +54,15 @@ func StartServer(port int) {
 
 type DataService struct {
 	api.UnimplementedDataServiceServer
+	datastore Datastore
 }
-
-func errKeyDoesNotExist(key string) error {
-	return errors.New(fmt.Sprintf("key %s does not exist in the datastore", key))
-}
-
-var datastore = make(map[string]string)
 
 func (s DataService) PutRecord(ctx context.Context, request *api.PutRequest) (*api.Record, error) {
-	datastore[request.Key] = request.Value
+	err := s.datastore.Put(request.Key, request.Value)
+	if err != nil {
+		return nil, err
+	}
+
 	return &api.Record{
 		Key:   request.Key,
 		Value: request.Value,
@@ -69,13 +70,13 @@ func (s DataService) PutRecord(ctx context.Context, request *api.PutRequest) (*a
 }
 
 func (s DataService) GetRecord(ctx context.Context, request *api.GetRequest) (*api.Record, error) {
-	if value, ok := datastore[request.Key]; ok {
-		return &api.Record{
-			Key:   request.Key,
-			Value: value,
-		}, nil
-	} else {
-		return nil, errKeyDoesNotExist(request.Key)
+	value, err := s.datastore.Get(request.Key)
+	if err != nil {
+		return nil, err
 	}
 
+	return &api.Record{
+		Key:   request.Key,
+		Value: value,
+	}, nil
 }
