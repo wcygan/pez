@@ -24,5 +24,5 @@ func (d *Datastore) Get(key string) (string, error) {
 }
 
 func errKeyDoesNotExist(key string) error {
-	return errors.New(fmt.Sprintf("key %s does not exist in the datastore", key))
+	return errors.New(fmt.Sprintf("key `%s` does not exist in the datastore", key))
 }
