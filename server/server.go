@@ -40,7 +40,7 @@ func StartServer(port int) {
 
 	dataService := DataService{
 		UnimplementedDataServiceServer: api.UnimplementedDataServiceServer{},
-		datastore:                      Datastore{backingStore: make(map[string]string)},
+		datastore:                      newDatastore(),
 	}
 
 	grpcServer := grpc.NewServer()

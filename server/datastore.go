@@ -30,6 +30,10 @@ type Datastore struct {
 	backingStore map[string]string
 }
 
+func newDatastore() Datastore {
+	return Datastore{backingStore: make(map[string]string)}
+}
+
 func (d *Datastore) Put(key, value string) error {
 	d.backingStore[key] = value
 	return nil
